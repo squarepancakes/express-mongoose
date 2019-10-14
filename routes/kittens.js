@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const Kitten = require("../models/Kitten");
+const jwt = require("jsonwebtoken");
+const SECRET_KEY = "pies of a family";
 
 router.get("/", async (req, res, next) => {
 	try {
@@ -83,21 +85,19 @@ router.patch("/:name", async (req, res, next) => {
 	}
 });
 
-// router.delete("/:name", async (req, res, next) => {
-// 	try {
-// 		const nameOfKitten = req.params.name;
-// 		const regex = new RegExp(nameOfKitten, "gi");
-// 		const oneKitten = await Kitten.find({ name: regex });
-// 		const query = {id: oneKitten.id};
-// 		console.log(oneKitten.id);
-// 		const deleteKitten = await Kitten.findByIdAndDelete(query);
-// 		res.send(deleteKitten);
-// 	}
-// 	catch (err) {
-// 		next(err)
-// 	}
-// })
-router.delete("/:name", async (req, res, next) => {
+const protectRoute = (req, res, next) => {
+	try {
+		if (!req.cookies.token) {
+			throw new Error("No kittens for you!");
+		}
+		req.user = jwt.verify(req.cookies.token, SECRET_KEY);
+		next();
+	} catch (err) {
+		res.status(401).end();
+	}
+};
+
+router.delete("/:name", protectRoute, async (req, res, next) => {
 	try {
 		const nameOfKitten = req.params.name;
 		const regex = new RegExp(nameOfKitten, "gi");

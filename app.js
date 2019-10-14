@@ -1,7 +1,17 @@
 const express = require("express");
 const app = express();
 const cookieParser = require("cookie-parser");
+const cors = require("cors");
 
+// using cors library
+const corsOptions = {
+	credentials: true,
+	allowedHeaders: "content-type",
+	methods: "DELETE",
+	origin: "http://localhost:3000"
+};
+
+app.use(cors(corsOptions));
 
 // cookie parser
 app.use(cookieParser());
@@ -13,14 +23,6 @@ if (process.env.NODE_ENV !== "test") {
 	// connect to db, not in use
 	require("./db");
 }
-
-// set CORS, usually by a library
-app.use((req, res, next) => {
-	res.set("Access-Control-Allow-Credentials", true);
-	res.set("Access-Control-Allow-Headers", "content-type");
-	res.set("Access-Control-Allow-Origin", "http://localhost:3000");
-	next();
-});
 
 // create routes
 const index = require("./routes/index");
