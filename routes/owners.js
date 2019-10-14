@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Owner = require("../models/Owner");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = "pies of a family";
 
 router.get("/", async (req, res, next) => {
 	try {
@@ -15,7 +14,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/secret", async (req, res, next) => {
 	try {
-		const decoded = jwt.verify(req.cookies.token, SECRET_KEY);
+		const decoded = jwt.verify(req.cookies.token, process.env.SECRET_KEY);
 		res.send("username: " + decoded.name);
 	} catch (err) {
 		err.status = 401;
@@ -52,7 +51,7 @@ router.post("/login", async (req, res, next) => {
 
 		const payload = { name: owner.username };
 
-		const token = jwt.sign(payload, SECRET_KEY);
+		const token = jwt.sign(payload, process.env.JWT_SECRET_KEY);
 
 		res.cookie("token", token);
 		res.send(owner);
@@ -69,7 +68,7 @@ const protectedRoute = (req, res, next) => {
 		if (!req.cookies.token) {
 			throw new Error("Go away!");
 		}
-		req.user = jwt.verify(req.cookies.token, SECRET_KEY);
+		req.user = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
 		next();
 	} catch (err) {
 		res.status(401).end();

@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Kitten = require("../models/Kitten");
 const jwt = require("jsonwebtoken");
-const SECRET_KEY = "pies of a family";
 
 router.get("/", async (req, res, next) => {
 	try {
@@ -90,7 +89,7 @@ const protectRoute = (req, res, next) => {
 		if (!req.cookies.token) {
 			throw new Error("No kittens for you!");
 		}
-		req.user = jwt.verify(req.cookies.token, SECRET_KEY);
+		req.user = jwt.verify(req.cookies.token, process.env.JWT_SECRET_KEY);
 		next();
 	} catch (err) {
 		res.status(401).end();
