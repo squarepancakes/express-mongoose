@@ -12,8 +12,7 @@ if (process.env.NODE_ENV !== "test") {
 const corsOptions = {
 	credentials: true,
 	allowedHeaders: "content-type",
-	methods: "DELETE",
-	origin: "http://localhost:3000"
+	origin: process.env.REACT_APP_URL
 };
 
 app.use(cors(corsOptions));
