@@ -100,6 +100,7 @@ describe("owners", () => {
 
 	describe("GET /owners", () => {
 		it("GET / should return list of owners", async () => {
+			jwt.verify.mockReturnValueOnce({});
 			const expectedOwners = [
 				{ username: "strawberry" },
 				{ username: "raspberry" }
@@ -107,6 +108,7 @@ describe("owners", () => {
 
 			const { body: actualOwners } = await request(app)
 				.get("/owners")
+				.set("Cookie", `token=some-token`)
 				.expect(200);
 			expectedOwners.forEach((owner, index) => {
 				expect(actualOwners[index]).toEqual(expect.objectContaining(owner));

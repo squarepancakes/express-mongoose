@@ -3,6 +3,9 @@ const Kitten = require("../models/Kitten");
 const request = require("supertest");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
+const jwt = require("jsonwebtoken");
+
+jest.mock("jsonwebtoken");
 
 describe("Kittens", () => {
 	let mongoServer;
@@ -11,7 +14,7 @@ describe("Kittens", () => {
 			mongoServer = new MongoMemoryServer();
 			const mongoUri = await mongoServer.getConnectionString();
 			// connect to server before setting.
-			
+
 			mongoose.set("useNewUrlParser", true);
 			mongoose.set("useFindAndModify", false);
 			mongoose.set("useCreateIndex", true);
@@ -80,10 +83,10 @@ describe("Kittens", () => {
 				});
 		});
 	});
-	
+
 	describe("PATCH /kittens", () => {
 		it("should edit a kitten", async () => {
-			const newKittenDetails = {age: 5};
+			const newKittenDetails = { age: 5 };
 			await request(app)
 				.patch("/kittens/fluff")
 				.send(newKittenDetails)
@@ -96,13 +99,13 @@ describe("Kittens", () => {
 		});
 	});
 
-
-
 	describe("DELETE /kittens", () => {
 		it("should delete a kitten", async () => {
+			jwt.verify.mockReturnValueOnce({});
 			const deleteKitten = { name: "Puff", age: 5, sex: "female" };
 			await request(app)
 				.delete("/kittens/puff")
+				.set("Cookie", `token=some-token`)
 				.send(deleteKitten)
 				.expect(200)
 				.expect(({ body: actualKittens }) => {
