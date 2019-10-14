@@ -15,9 +15,6 @@ router.get("/", async (req, res, next) => {
 
 router.get("/secret", async (req, res, next) => {
 	try {
-		if (!req.cookies.token) {
-			throw new Error("Go away!");
-		}
 		const decoded = jwt.verify(req.cookies.token, SECRET_KEY);
 		res.send("username: " + decoded.name);
 	} catch (err) {
@@ -37,6 +34,11 @@ router.post("/new", async (req, res, next) => {
 		next(err);
 	}
 });
+
+router.post("/logout", (req, res) => {
+	res.clearCookie("token").send("You are now logged out!");
+  });
+  
 
 router.post("/login", async (req, res, next) => {
 	try {
@@ -62,7 +64,19 @@ router.post("/login", async (req, res, next) => {
 	}
 });
 
-router.get("/:name", async (req, res, next) => {
+const protectedRoute = (req, res, next) => {
+	try {
+		if (!req.cookies.token) {
+			throw new Error("Go away!");
+		}
+		req.user = jwt.verify(req.cookies.token, SECRET_KEY);
+		next();
+	} catch (err) {
+		res.status(401).end();
+	}
+};
+
+router.get("/:name", protectedRoute, async (req, res, next) => {
 	try {
 		const firstName = req.params.name;
 		const regex = new RegExp(firstName, "gi");

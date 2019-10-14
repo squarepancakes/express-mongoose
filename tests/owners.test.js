@@ -3,6 +3,9 @@ const Owner = require("../models/Owner");
 const request = require("supertest");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
+const jwt = require("jsonwebtoken");
+
+jest.mock("jsonwebtoken");
 
 describe("owners", () => {
 	let mongoServer;
@@ -29,12 +32,13 @@ describe("owners", () => {
 
 	beforeEach(async () => {
 		await Owner.create([
-			{ username: "strawberry", password: "1234567" },
-			{ username: "raspberry", password: "1234567" }
+			{ firstName: "Strawberry", username: "strawberry", password: "1234567" },
+			{ firstName: "Raspberry", username: "raspberry", password: "1234567" }
 		]);
 	});
 
 	afterEach(async () => {
+		jest.resetAllMocks();
 		await Owner.deleteMany();
 	});
 
@@ -66,18 +70,31 @@ describe("owners", () => {
 		});
 	});
 
-	xdescribe("GET /owners/secret - protected routes", () => {
+	describe("GET /owners/:name - protected routes", () => {
 		it("denies access when owner is not authorized", async () => {
 			await request(app)
-				.get("/owners/secret")
+				.get("/owners/strawberry")
 				.expect(401);
+			expect(jwt.verify).not.toHaveBeenCalledTimes(1);
+		});
+		it("denies access when owner is not authorized", async () => {
+			jwt.verify.mockImplementation(() => {
+				throw new Error();
+			});
+			await request(app)
+				.get("/owners/strawberry")
+				.set("Cookie", "token=invalid-token")
+				.expect(401);
+			expect(jwt.verify).toHaveBeenCalledTimes(1);
 		});
 
 		it("grants access when owner is authorized", async () => {
+			jwt.verify.mockReturnValueOnce({});
 			await request(app)
-				.get("/owners/secret")
-				.set({ token: "orange" })
+				.get("/owners/strawberry")
+				.set("Cookie", `token=some-token`)
 				.expect(200);
+			expect(jwt.verify).toHaveBeenCalledTimes(1);
 		});
 	});
 
