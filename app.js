@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== "test") {
 const corsOptions = {
 	credentials: true,
 	allowedHeaders: "content-type",
-	origin: process.env.REACT_APP_URL
+	origin: "https://reacting-kittens.netlify.com"
 };
 
 app.use(cors(corsOptions));
