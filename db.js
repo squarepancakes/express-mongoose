@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const dbName = "kittens-db";
 
 let dbURL;
-if ((process.env.NODE_ENV = "development")) {
+if (process.env.NODE_ENV === "development") {
 	dbURL = `mongodb://localhost/${dbName}`;
 }
 
