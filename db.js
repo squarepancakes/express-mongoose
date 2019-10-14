@@ -6,6 +6,10 @@ if (process.env.NODE_ENV === "development") {
 	dbURL = `mongodb://localhost/${dbName}`;
 }
 
+if (process.env.NODE.ENV === "production") {
+	dbURL = process.env.MONGO_URI;
+}
+
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
 mongoose.set("useCreateIndex", true);
