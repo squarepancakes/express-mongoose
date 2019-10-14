@@ -3,6 +3,11 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 
+if (process.env.NODE_ENV !== "test") {
+	// connect to db, not in use
+	require("./db");
+}
+
 // using cors library
 const corsOptions = {
 	credentials: true,
@@ -18,11 +23,6 @@ app.use(cookieParser());
 
 // body parser
 app.use(express.json());
-
-if (process.env.NODE_ENV !== "test") {
-	// connect to db, not in use
-	require("./db");
-}
 
 // create routes
 const index = require("./routes/index");
