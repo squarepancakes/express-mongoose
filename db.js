@@ -8,6 +8,8 @@ if (process.env.NODE_ENV === "development") {
 
 if (process.env.NODE.ENV === "production") {
 	dbURL = process.env.MONGO_URI;
+	console.log("MONGO_URI", process.env.MONGO_URI);
+	console.log("dbUrl", dbURL);
 }
 
 mongoose.set("useNewUrlParser", true);
